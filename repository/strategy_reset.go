@@ -25,6 +25,8 @@ func (s *ResetStrategy) Run(ctx context.Context) (bool, *github.PullRequest, err
 		return false, nil, fmt.Errorf("failed to clone repository %s: %w", s.Repository.FullName(), err)
 	}
 
+	s.Options.GitHub.adjustOptionsFromGitRepository(gitRepo)
+
 	existingPR, err := s.Repository.findMatchingPullRequest(ctx, s.Options.GitHub)
 	if err != nil {
 		return false, nil, fmt.Errorf("failed to find matching pull request for repository %s: %w", s.Repository.FullName(), err)

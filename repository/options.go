@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/dailymotion-oss/octopilot/update"
+	"github.com/go-git/go-git/v5"
 )
 
 // definition of the different kind of Pull Request update operations
@@ -204,5 +205,13 @@ func (o *GitHubOptions) setDefaultUpdateOperation(defaultUpdateOperation string)
 	}
 	if len(o.PullRequest.BodyUpdateOperation) == 0 {
 		o.PullRequest.BodyUpdateOperation = defaultUpdateOperation
+	}
+}
+
+func (o *GitHubOptions) adjustOptionsFromGitRepository(gitRepo *git.Repository) {
+	if len(o.PullRequest.BaseBranch) == 0 {
+		if head, err := gitRepo.Head(); err == nil {
+			o.PullRequest.BaseBranch = head.Name().Short()
+		}
 	}
 }
