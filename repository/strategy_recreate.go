@@ -24,7 +24,10 @@ func (s *RecreateStrategy) Run(ctx context.Context) (bool, *github.PullRequest, 
 		return false, nil, fmt.Errorf("failed to clone repository %s: %w", s.Repository.FullName(), err)
 	}
 
-	s.Options.GitHub.adjustOptionsFromGitRepository(gitRepo)
+	err = s.Options.GitHub.adjustOptionsFromGitRepository(gitRepo)
+	if err != nil {
+		return false, nil, fmt.Errorf("failed to adjust options for repository %s: %w", s.Repository.FullName(), err)
+	}
 
 	branchName := s.Repository.newBranchName(s.Options.Git.BranchPrefix)
 	err = switchBranch(ctx, gitRepo, switchBranchOptions{

@@ -25,7 +25,10 @@ func (s *ResetStrategy) Run(ctx context.Context) (bool, *github.PullRequest, err
 		return false, nil, fmt.Errorf("failed to clone repository %s: %w", s.Repository.FullName(), err)
 	}
 
-	s.Options.GitHub.adjustOptionsFromGitRepository(gitRepo)
+	err = s.Options.GitHub.adjustOptionsFromGitRepository(gitRepo)
+	if err != nil {
+		return false, nil, fmt.Errorf("failed to adjust options for repository %s: %w", s.Repository.FullName(), err)
+	}
 
 	existingPR, err := s.Repository.findMatchingPullRequest(ctx, s.Options.GitHub)
 	if err != nil {

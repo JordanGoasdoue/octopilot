@@ -208,10 +208,16 @@ func (o *GitHubOptions) setDefaultUpdateOperation(defaultUpdateOperation string)
 	}
 }
 
-func (o *GitHubOptions) adjustOptionsFromGitRepository(gitRepo *git.Repository) {
+func (o *GitHubOptions) adjustOptionsFromGitRepository(gitRepo *git.Repository) error {
 	if len(o.PullRequest.BaseBranch) == 0 {
-		if head, err := gitRepo.Head(); err == nil {
-			o.PullRequest.BaseBranch = head.Name().Short()
+		if gitRepo == nil {
+			return errors.New("failed to resolve repository branch referenced by HEAD: repository is null")
 		}
+		head, err := gitRepo.Head()
+		if err != nil {
+			return fmt.Errorf("failed to resolve repository branch referenced by HEAD: %w", err)
+		}
+		o.PullRequest.BaseBranch = head.Name().Short()
 	}
+	return nil
 }
